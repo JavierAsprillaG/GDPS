@@ -1,13 +1,10 @@
 const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
-
-// Dimensiones del mapa y jugador
 const mapWidth = 1200;
 const mapHeight = 960;
 const playerWidth = 48;
 const playerHeight = 96;
 
-// Carga las imágenes
 const playerImages = {
     down: new Image(),
     up: new Image(),
@@ -25,16 +22,16 @@ playerImages.idle.src = './img/Bob_idle_16x16.png';
 const mapImage = new Image();
 mapImage.src = './img/habbo_juego.png';
 
-// Posición inicial del jugador
 let playerX = canvas.width / 2 - playerWidth / 2 -100;
 let playerY = canvas.height / 2 - playerHeight / 2 -100;
 
-const tileWidth = 48; // Tamaño correcto del tile
+// como el mapa fue creado en Tiled con una división de mapa por cuadrantes de 48x48 cada uno, se hacen los calculos
+// con base a estas medidas por cudrantes
+const tileWidth = 48;
 const tileHeight = 48;
 const mapWidthInTiles = Math.floor(mapWidth / tileWidth); 
 const colisionMap = [];
 
-// Convierte el arreglo unidimensional en un bidimensional
 for (let i = 0; i < colisiones.length; i += mapWidthInTiles) {
     colisionMap.push(colisiones.slice(i, i + mapWidthInTiles));
 }
@@ -44,7 +41,6 @@ let direction = 'down';
 let moving = false;
 let frame = 0;
 
-// Velocidad del jugador (ajustada 50% más rápida)
 const playerSpeed = 4;
 
 // Captura el input del teclado
@@ -70,23 +66,23 @@ document.addEventListener('keyup', (e) => {
 });
 
 let lastFrameTime = 0; // Tiempo del último frame
-const frameInterval = 100; // Intervalo entre frames en milisegundos (ajustar según necesites)
+const frameInterval = 100; // Intervalo entre frames en milisegundos
 
 function getPlayerBounds() {
-    const visibleHeight = 68; // Altura visible del personaje
-    const offsetY = playerHeight - visibleHeight; // El sobrante invisible
+    const visibleHeight = 68; 
+    const offsetY = playerHeight - visibleHeight;
 
     return {
         left: playerX,
         right: playerX + playerWidth,
-        top: playerY - offsetY, // Ajuste para considerar solo la parte visible
+        top: playerY - offsetY, //chanchullo
         bottom: playerY + playerHeight
     };
 }
 
 setInterval(() => {
     const bounds = getPlayerBounds();
-}, 100); // Imprime cada 100 ms
+}, 100); 
 
 // Actualiza el estado del jugador
 let lastPosition = { top: 0, left: 0, bottom: 0, right: 0 };
@@ -95,9 +91,10 @@ function checkCollision(x, y) {
     const bounds = {
         left: x,
         right: x + playerWidth,
-        top: y, // Ajusta para considerar solo la parte visible
+        top: y,
         bottom: y + playerHeight
     };
+
 
     const startTileX = Math.floor((bounds.left+6) / tileWidth);
     const endTileX = Math.floor((bounds.right-6) / tileWidth);
