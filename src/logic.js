@@ -14,7 +14,7 @@ function getRandomActions(event, numActions = 4) {
   return actions.slice(0, numActions);
 }
 
-function getUniqueElements(n, array = eventos) {
+export function getUniqueElements(n, array = eventos) {
   const uniqueMap = new Map();
 
   // Agregar elementos únicos a un mapa
