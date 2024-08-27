@@ -1,11 +1,22 @@
 //import { getUniqueElements } from "./src/logic.js";
 
 const canvas = document.getElementById("gameCanvas");
+const statsCanvas = document.getElementById("statsCanvas");
+const statsContext = statsCanvas.getContext("2d");
 const context = canvas.getContext("2d");
 const mapWidth = 1200;
 const mapHeight = 960;
 const playerWidth = 48;
 const playerHeight = 96;
+const iconSize = 24;
+const padding = 20;
+
+const icons = {
+  money: new Image(),
+  quality: new Image(),
+  motivation: new Image(),
+  time: new Image(),
+};
 
 const playerImages = {
   down: new Image(),
@@ -20,6 +31,11 @@ playerImages.up.src = "./img/Bob_run_up_16x16.png";
 playerImages.left.src = "./img/Bob_run_left_16x16.png";
 playerImages.right.src = "./img/Bob_run_right_16x16.png";
 playerImages.idle.src = "./img/Bob_idle_16x16.png";
+
+icons.money.src = './img/money_icon.png'; // Cambia la ruta a la imagen del icono de dinero
+icons.quality.src = './img/calidad_icon.png'; // Cambia la ruta a la imagen del icono de calidad
+icons.motivation.src = './img/motivacion_icon.png'; // Cambia la ruta a la imagen del icono de motivación
+icons.time.src = './img/tiempo_icon.png';
 
 const mapImage = new Image();
 mapImage.src = "./img/habbo_juego.png";
@@ -37,6 +53,45 @@ const colisionMap = [];
 for (let i = 0; i < colisiones.length; i += mapWidthInTiles) {
   colisionMap.push(colisiones.slice(i, i + mapWidthInTiles));
 }
+
+function drawStats() {
+  statsContext.clearRect(0, 0, statsCanvas.width, statsCanvas.height);
+  statsContext.font = '16px "Press Start 2P"';
+  statsContext.fillStyle = 'darkmagenta';
+
+  // Dibuja las estadísticas
+  const stats = [
+    { icon: icons.money, label: ':', value: money },
+    { icon: icons.quality, label: ':', value: calidad },
+    { icon: icons.motivation, label: ':', value: motivacion },
+    { icon: icons.time, label: ':', value: tiempo },
+  ];
+
+  const iconTextSpacing = 10; // Espacio reducido entre el icono y el texto
+  const itemSpacing = 90; // Espacio aumentado entre las estadísticas
+  const totalWidth = stats.reduce((acc, stat) => acc + iconSize + iconTextSpacing + statsContext.measureText(`${stat.label} ${stat.value}`).width, 0) + (stats.length - 1) * itemSpacing;
+  const startX = (statsCanvas.width - totalWidth) / 2; // Centrar las estadísticas en el canvas
+
+  let x = startX;
+  const y = statsCanvas.height / 2;
+
+  // Asegúrate de que no se dibuje fuera del canvas
+  if (x < 0) {
+    x = 0;
+  }
+
+  stats.forEach(stat => {
+    // Verifica si el icono y texto se dibujarán fuera del canvas
+    if (x + iconSize + iconTextSpacing + statsContext.measureText(`${stat.label} ${stat.value}`).width > statsCanvas.width) {
+      return; // Deja de dibujar si hay riesgo de desbordamiento
+    }
+
+    statsContext.drawImage(stat.icon, x, y - iconSize / 2, iconSize, iconSize);
+    statsContext.fillText(`${stat.label} ${stat.value}`, x + iconSize + iconTextSpacing, y + 5);
+    x += iconSize + iconTextSpacing + statsContext.measureText(`${stat.label} ${stat.value}`).width + itemSpacing; // Ajusta el espaciado entre estadísticas
+  });
+}
+
 
 // Estado del jugador
 let direction = "down";
@@ -105,7 +160,6 @@ function checkCollision(x, y) {
   for (let tileY = startTileY; tileY <= endTileY; tileY++) {
     for (let tileX = startTileX; tileX <= endTileX; tileX++) {
       if (colisionMap[tileY] && colisionMap[tileY][tileX] === 1693) {
-        console.log("Colisión detectada en:", tileX, tileY);
         return true;
       }
     }
@@ -155,17 +209,20 @@ function update(currentTime) {
 }
 
 ///////////////////////////////////////////////////// EVENTOS //////////////////////////////////////////////////////////
-const money = 1000; //aleatorio
-const maxVida = 100;
-//const vida = 100
-const calidad = 0;
-const motivacion = 100;
-const time = 180; //aleatorio entre 2 y 5 minutos
+let money = 150000; //aleatorio
+let calidad = 0;
+let motivacion = 100;
+let tiempo = 180; //aleatorio entre 2 y 5 minutos
 const minEventos = 5; //aleatorio entre 5 y 10
 const maxEventos = 10;
 
-const barraVidaImg = new Image();
-barraVidaImg.src = "./img/arrow_4.png";
+const timeInterval = 1000; // Intervalo de 1000 milisegundos (1 segundo)
+setInterval(() => {
+  if (tiempo > 0) {
+    tiempo -= 1; // Decrementa el tiempo por 1 segundo
+    drawStats(); // Redibuja las estadísticas para reflejar el nuevo valor
+  }
+}, timeInterval);
 
 const eventos = getUniqueElements(10);
 console.log(eventos);
@@ -345,13 +402,30 @@ canvas.addEventListener("click", (event) => {
     for (const button of actionButtons) {
       const { x, y, size, index } = button;
       if (mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size) {
-        console.log("Acción seleccionada:", eventos[i].actions[index].description);
-        // Aquí puedes agregar la lógica para manejar la acción seleccionada
+        const selectedEvent = eventos.find(evento => evento.description === message.split("\n\n")[0]);
+        if (selectedEvent) {
+          console.log("Acción seleccionada:", selectedEvent.actions[index].description);
+          motivacion += selectedEvent.actions[index].cost.motivacion;
+          calidad += selectedEvent.actions[index].cost.calidad;
+          money += selectedEvent.actions[index].cost.money;
+          tiempo += selectedEvent.actions[index].cost.tiempo;
+          console.log("Motivación evento:", selectedEvent.actions[index].cost.motivacion);
+          console.log("Calidad evento:", selectedEvent.actions[index].cost.calidad);
+          console.log("Dinero evento:", selectedEvent.actions[index].cost.money);
+          console.log("Tiempo evento:", selectedEvent.actions[index].cost.tiempo);
+          console.log("Motivación:", motivacion);
+          console.log("Calidad:", calidad);
+          console.log("Dinero:", money);
+          console.log("Tiempo:", tiempo);
+          showMessage = false;
+          closeButton = null;
+          actionButtons = [];s
+        }
         return;
       }
     }
   }
-
+  
   // Verifica si se hace clic en una burbuja
   for (let i = 0; i < posiciones.length; i++) {
     const [x, y] = posiciones[i];
@@ -445,27 +519,11 @@ function draw() {
 
 
 
-
-// canvas.addEventListener("click", (event) => {
-//     const rect = canvas.getBoundingClientRect();
-//     const mouseX = event.clientX - rect.left;
-//     const mouseY = event.clientY - rect.top;
-  
-//     for (let i = 0; i < posiciones.length; i++) {
-//       const [x, y] = posiciones[i];
-//       const distance = Math.sqrt((mouseX - x) ** 2 + (mouseY - y) ** 2);
-//       if (distance < bubbleRadius) {
-//         console.log("Bubble clicked:", i);
-//         // Lógica para mostrar un mensaje o desplegar más información
-//         break;
-//       }
-//     }
-//   });
-
 // Inicia la animación
 function gameLoop(currentTime) {
   update(currentTime);
   draw();
+  drawStats();
   requestAnimationFrame(gameLoop);
 }
 
