@@ -208,11 +208,15 @@ let messageX = 0;
 let messageY = 0;
 let closeButton = null;
 
+// Variables globales para los botones de acción
+const actionButtonSize = 20; // Tamaño del botón de acción
+let actionButtons = [];
+
 function drawMessage() {
   if (showMessage) {
     const paddingSides = 30;  // Margen en los lados derecho, izquierdo e inferior
     const paddingTop = 50;  // Margen superior más grande
-    const maxLineWidth = 400;  // Máximo ancho que una línea puede ocupar
+    const maxLineWidth = 420;  // Máximo ancho que una línea puede ocupar
     const lineHeight = 24;  // Altura de cada línea de texto
     const extraLineSpacing = 10; // Espacio extra entre el evento y las acciones
 
@@ -244,7 +248,7 @@ function drawMessage() {
     lines.push(""); 
 
     // Procesa cada acción
-    actionsDescriptions.forEach(action => {
+    actionsDescriptions.forEach((action, index) => {
       const actionWords = action.split(" ");
       currentLine = "";
 
@@ -263,7 +267,7 @@ function drawMessage() {
     });
 
     // Calcula la altura dinámica del cuadro en función del número de líneas
-    const msgHeight = lines.length * lineHeight + paddingTop + paddingSides + (actionsDescriptions.length * extraLineSpacing);
+    const msgHeight = lines.length * lineHeight + paddingTop + paddingSides + (actionsDescriptions.length * (extraLineSpacing + actionButtonSize));
     const msgWidth = maxLineWidth + paddingSides * 2;
 
     messageX = (canvas.width - msgWidth) / 2;
@@ -279,20 +283,38 @@ function drawMessage() {
 
     // Dibuja el texto
     context.fillStyle = 'white';
+    let yOffset = messageY + paddingTop;
     lines.forEach((line, index) => {
-      const yOffset = messageY + paddingTop + (index * lineHeight);
       context.fillText(line, messageX + paddingSides, yOffset);
+      yOffset += lineHeight;
     });
 
-    // Botón de cerrar: Calcula posición y tamaño dinámicamente
+    actionButtons = [];
+    const numActions = actionsDescriptions.length;
+    const buttonSpacing = (msgHeight - paddingTop - paddingSides - 260) / (numActions - 1); // Espacio entre botones
+    
+    actionsDescriptions.forEach((_, index) => {
+      const buttonX = messageX + msgWidth - (paddingSides/2) - actionButtonSize;
+      // Se calcula el buttonY en base al índice y el espaciado entre botones
+      const buttonY = messageY + paddingTop + (index+1) * buttonSpacing;
+    
+      context.fillStyle = 'blue';
+      context.fillRect(buttonX, buttonY - actionButtonSize / 2, actionButtonSize, actionButtonSize); // Cuadrado azul para el botón
+      context.fillStyle = 'white';
+      context.font = '12px "Press Start 2P"';
+      context.fillText('>', buttonX + 5, buttonY - actionButtonSize / 2 + 15); // Texto ">" para el botón
+    
+      actionButtons.push({ x: buttonX, y: buttonY - actionButtonSize / 2, size: actionButtonSize, index });
+    });
+    
+    // Dibuja el botón de cerrar
     const closeButtonSize = 20;
     const closeButtonPadding = 10;
     const closeButtonX = messageX + msgWidth - closeButtonSize - closeButtonPadding;
     const closeButtonY = messageY + closeButtonPadding;
     
-    // Dibuja el botón de cerrar
     context.fillStyle = 'red';
-    context.fillRect(closeButtonX+2.5, closeButtonY-3, closeButtonSize, closeButtonSize); // Cuadrado rojo
+    context.fillRect(closeButtonX, closeButtonY, closeButtonSize, closeButtonSize); // Cuadrado rojo
     context.fillStyle = 'white';
     context.font = '16px "Press Start 2P"';
     context.fillText('X', closeButtonX + 5, closeButtonY + 15); // Letra "X"
@@ -313,7 +335,20 @@ canvas.addEventListener("click", (event) => {
     if (mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size) {
       showMessage = false;
       closeButton = null;
+      actionButtons = [];
       return;
+    }
+  }
+
+  // Verificar si se hace clic en un botón de acción
+  if (showMessage && actionButtons.length) {
+    for (const button of actionButtons) {
+      const { x, y, size, index } = button;
+      if (mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size) {
+        console.log("Acción seleccionada:", eventos[i].actions[index].description);
+        // Aquí puedes agregar la lógica para manejar la acción seleccionada
+        return;
+      }
     }
   }
 
@@ -335,7 +370,6 @@ canvas.addEventListener("click", (event) => {
     }
   }
 });
-
 
 
 // Dibuja el personaje y eventos
