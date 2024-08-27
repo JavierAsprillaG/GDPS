@@ -165,7 +165,7 @@ const minEventos = 5; //aleatorio entre 5 y 10
 const maxEventos = 10;
 
 const barraVidaImg = new Image();
-barraVidaImg.src = ".img/arrow_4.png";
+barraVidaImg.src = "./img/arrow_4.png";
 
 const eventos = getUniqueElements(10);
 console.log(eventos);
@@ -206,69 +206,137 @@ let message = "";
 let messageBg = ""; // Puede ser un color o una imagen
 let messageX = 0;
 let messageY = 0;
+let closeButton = null;
 
 function drawMessage() {
-    if (showMessage) {
-      const msgWidth = 400;
-      const msgHeight = 200;
-  
-      messageX = (canvas.width - msgWidth) / 2;
-      messageY = (canvas.height - msgHeight) / 2;
-  
-      // Dibuja el fondo
-      if (messageBg instanceof Image) {
-        context.drawImage(messageBg, messageX, messageY, msgWidth, msgHeight);
+  if (showMessage) {
+    const paddingSides = 30;  // Margen en los lados derecho, izquierdo e inferior
+    const paddingTop = 50;  // Margen superior más grande
+    const maxLineWidth = 400;  // Máximo ancho que una línea puede ocupar
+    const lineHeight = 24;  // Altura de cada línea de texto
+    const extraLineSpacing = 10; // Espacio extra entre el evento y las acciones
+
+    context.font = '16px "Press Start 2P"';
+    
+    // Divide el texto del evento en líneas
+    const eventDescription = message.split("\n\n")[0];
+    const actionsDescriptions = message.split("\n\n")[1].split("\n");
+
+    let lines = [];
+    
+    // Procesa la descripción del evento
+    let currentLine = "";
+    const words = eventDescription.split(" ");
+    words.forEach((word) => {
+      const testLine = currentLine + word + " ";
+      const testWidth = context.measureText(testLine).width;
+
+      if (testWidth > maxLineWidth) {
+        lines.push(currentLine.trim());
+        currentLine = word + " ";
       } else {
-        context.fillStyle = messageBg;
-        context.fillRect(messageX, messageY, msgWidth, msgHeight);
+        currentLine = testLine;
       }
-  
-      // Dibuja el texto
-      context.font = '16px "Press Start 2P"';
-      context.fillStyle = 'white';
-      context.fillText(message, messageX + 20, messageY + 50);
-  
-      // Dibuja el botón de cerrar
-      context.fillStyle = 'red';
-      context.fillRect(messageX + msgWidth - 30, messageY + 10, 20, 20); // Cuadrado rojo
-      context.fillStyle = 'white';
-      context.font = '16px "Press Start 2P"';
-      context.fillText('X', messageX + msgWidth - 26, messageY + 26); // Letra "X"
-    }
-  }
-  
-  canvas.addEventListener("click", (event) => {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-  
-    // Verificar si se hace clic en el botón de cerrar
-    if (showMessage) {
-        const closeButtonX = messageX + 370;
-        const closeButtonY = messageY + 10;
-        if (mouseX >= closeButtonX && mouseX <= closeButtonX + 20 && mouseY >= closeButtonY && mouseY <= closeButtonY + 20) {
-        showMessage = false;
-        return;
+    });
+    lines.push(currentLine.trim()); // Agrega la última línea de la descripción del evento
+
+    // Agrega un espacio extra entre la descripción del evento y las acciones
+    lines.push(""); 
+
+    // Procesa cada acción
+    actionsDescriptions.forEach(action => {
+      const actionWords = action.split(" ");
+      currentLine = "";
+
+      actionWords.forEach((word) => {
+        const testLine = currentLine + word + " ";
+        const testWidth = context.measureText(testLine).width;
+
+        if (testWidth > maxLineWidth) {
+          lines.push(currentLine.trim());
+          currentLine = word + " ";
+        } else {
+          currentLine = testLine;
         }
+      });
+      lines.push(currentLine.trim());
+    });
+
+    // Calcula la altura dinámica del cuadro en función del número de líneas
+    const msgHeight = lines.length * lineHeight + paddingTop + paddingSides + (actionsDescriptions.length * extraLineSpacing);
+    const msgWidth = maxLineWidth + paddingSides * 2;
+
+    messageX = (canvas.width - msgWidth) / 2;
+    messageY = (canvas.height - msgHeight) / 2;
+
+    // Dibuja el fondo
+    if (messageBg instanceof Image) {
+      context.drawImage(messageBg, messageX, messageY, msgWidth, msgHeight);
+    } else {
+      context.fillStyle = messageBg;
+      context.fillRect(messageX, messageY, msgWidth, msgHeight);
     }
 
-    for (let i = 0; i < posiciones.length; i++) {
-      const [x, y] = posiciones[i];
-      const distance = Math.sqrt((mouseX - x) ** 2 + (mouseY - y) ** 2);
-      if (distance < bubbleRadius) {
-        console.log("Bubble clicked:", i);
-        
-        // Establecer mensaje y fondo
-        showMessage = true;
-        message = "Este es un mensaje";
-        messageBg = 'black'; // Puede ser un color o una imagen
-        messageX = x;
-        messageY = y;
-  
-        break;
-      }
+    // Dibuja el texto
+    context.fillStyle = 'white';
+    lines.forEach((line, index) => {
+      const yOffset = messageY + paddingTop + (index * lineHeight);
+      context.fillText(line, messageX + paddingSides, yOffset);
+    });
+
+    // Botón de cerrar: Calcula posición y tamaño dinámicamente
+    const closeButtonSize = 20;
+    const closeButtonPadding = 10;
+    const closeButtonX = messageX + msgWidth - closeButtonSize - closeButtonPadding;
+    const closeButtonY = messageY + closeButtonPadding;
+    
+    // Dibuja el botón de cerrar
+    context.fillStyle = 'red';
+    context.fillRect(closeButtonX+2.5, closeButtonY-3, closeButtonSize, closeButtonSize); // Cuadrado rojo
+    context.fillStyle = 'white';
+    context.font = '16px "Press Start 2P"';
+    context.fillText('X', closeButtonX + 5, closeButtonY + 15); // Letra "X"
+    
+    // Guarda la posición del botón de cerrar para la detección de clics
+    closeButton = { x: closeButtonX, y: closeButtonY, size: closeButtonSize };
+  }
+}
+
+canvas.addEventListener("click", (event) => {
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+
+  // Verificar si se hace clic en el botón de cerrar
+  if (showMessage && closeButton) {
+    const { x, y, size } = closeButton;
+    if (mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size) {
+      showMessage = false;
+      closeButton = null;
+      return;
     }
-  });
+  }
+
+  // Verifica si se hace clic en una burbuja
+  for (let i = 0; i < posiciones.length; i++) {
+    const [x, y] = posiciones[i];
+    const distance = Math.sqrt((mouseX - x) ** 2 + (mouseY - y) ** 2);
+    if (distance < bubbleRadius) {
+      console.log("Bubble clicked:", i);
+      
+      const event = eventos[i];
+
+      // Establecer mensaje y fondo
+      showMessage = true;
+      message = event.description + "\n\n" + event.actions.map(action => "- " + action.description).join("\n");
+      messageBg = 'black'; // Puede ser un color o una imagen
+
+      break;
+    }
+  }
+});
+
+
 
 // Dibuja el personaje y eventos
 function draw() {
