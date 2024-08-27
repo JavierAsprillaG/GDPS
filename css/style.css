@@ -1,0 +1,34 @@
+#eventCard {
+    position: absolute;
+    width: 300px;
+    height: 200px;
+    background-color: rgba(0, 0, 0, 0.8); /* Fondo con transparencia */
+    border: 2px solid white;
+    border-radius: 10px;
+    padding: 20px;
+    font-family: 'Pixelar', sans-serif;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 10;
+}
+
+#eventMessage {
+    font-size: 16px; /* Ajusta el tamaño según sea necesario */
+}
+
+.hidden {
+    display: none;
+}
+
+@font-face {
+    font-family: 'MyPixelFont';
+    src: url('fonts/my-pixel-font.woff2') format('woff2'),
+         url('fonts/my-pixel-font.woff') format('woff');
+}
+
+body {
+    font-family: 'MyPixelFont', sans-serif;
+}

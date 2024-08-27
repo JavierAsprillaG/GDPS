@@ -1,4 +1,4 @@
-import { getUniqueElements } from "./src/logic.js";
+//import { getUniqueElements } from "./src/logic.js";
 
 const canvas = document.getElementById("gameCanvas");
 const context = canvas.getContext("2d");
@@ -146,7 +146,6 @@ function update(currentTime) {
     newX += playerSpeed;
     direction = "right";
   }
-  checkNearbyEvents();
 
   // Verificar colisión en la nueva posición
   if (!checkCollision(newX, newY)) {
@@ -169,81 +168,107 @@ const barraVidaImg = new Image();
 barraVidaImg.src = ".img/arrow_4.png";
 
 const eventos = getUniqueElements(10);
+console.log(eventos);
+const posiciones = [ [145,320],[145,433],[145,665],[410,190],[627,532],[246,790], [838,616],[1085,219],[1071,549],[536,756]]
 
-function drawEvents() {
-  eventos.forEach((evento) => {
-    // Dibujar la burbuja en la posición del evento
-    context.beginPath();
-    context.arc(evento.x, evento.y, 20, 0, Math.PI * 2); // Ejemplo de burbuja circular
-    context.fillStyle = "rgba(255, 255, 255, 0.8)"; // Color y transparencia
-    context.fill();
-    context.closePath();
-  });
-}
+const bubbleImage = new Image();
+bubbleImage.src = 'img/icon_11.png';
+const bubbleWidth = 48; // Ajusta según el tamaño de la burbuja
+const bubbleHeight = 48; // Ajusta según el tamaño de la burbuja
+const bubbleRadius = 24;
+const borderWidth = 2; // Ancho del borde
 
-function dibujarFondoBarra() {
-  ctx.fillStyle = "black";
-  ctx.fillRect(0, 960, 1200, 20);
-}
+// Variables para el hover de las burbujas
+const hoverScale = 1.2; // Escala para el hover
+let hoveredBubble = null;
 
-function dibujarBarraVida() {
-  const anchoBarra = (vida / vidaMaxima) * 184;
-  ctx.drawImage(barraVidaImg, (canvas.width - 184) / 2, 964, anchoBarra, 12);
-}
-
-canvas.addEventListener("click", (event) => {
+// Manejo del mouse
+canvas.addEventListener("mousemove", (event) => {
   const rect = canvas.getBoundingClientRect();
   const mouseX = event.clientX - rect.left;
   const mouseY = event.clientY - rect.top;
 
-  eventos.forEach((evento) => {
-    const distanceX = Math.abs(mouseX - evento.x);
-    const distanceY = Math.abs(mouseY - evento.y);
+  hoveredBubble = null;
 
-    if (distanceX < 20 && distanceY < 20) {
-      // Radio de la burbuja
-      // Mostrar tarjeta del evento
-      mostrarTarjeta(evento.descripcion);
+  for (let i = 0; i < posiciones.length; i++) {
+    const [x, y] = posiciones[i];
+    const distance = Math.sqrt((mouseX - x) ** 2 + (mouseY - y) ** 2);
+    if (distance < bubbleRadius) {
+      hoveredBubble = i;
+      break;
     }
-  });
+  }
 });
 
-function checkNearbyEvents() {
-  const playerBounds = getPlayerBounds();
+// Variables para el mensaje
+let showMessage = false;
+let message = "";
+let messageBg = ""; // Puede ser un color o una imagen
+let messageX = 0;
+let messageY = 0;
 
-  eventos.forEach((evento) => {
-    const distanceX = Math.abs(evento.x - playerBounds.left);
-    const distanceY = Math.abs(evento.y - playerBounds.bottom);
+function drawMessage() {
+    if (showMessage) {
+      const msgWidth = 400;
+      const msgHeight = 200;
+  
+      messageX = (canvas.width - msgWidth) / 2;
+      messageY = (canvas.height - msgHeight) / 2;
+  
+      // Dibuja el fondo
+      if (messageBg instanceof Image) {
+        context.drawImage(messageBg, messageX, messageY, msgWidth, msgHeight);
+      } else {
+        context.fillStyle = messageBg;
+        context.fillRect(messageX, messageY, msgWidth, msgHeight);
+      }
+  
+      // Dibuja el texto
+      context.font = '16px "Press Start 2P"';
+      context.fillStyle = 'white';
+      context.fillText(message, messageX + 20, messageY + 50);
+  
+      // Dibuja el botón de cerrar
+      context.fillStyle = 'red';
+      context.fillRect(messageX + msgWidth - 30, messageY + 10, 20, 20); // Cuadrado rojo
+      context.fillStyle = 'white';
+      context.font = '16px "Press Start 2P"';
+      context.fillText('X', messageX + msgWidth - 26, messageY + 26); // Letra "X"
+    }
+  }
+  
+  canvas.addEventListener("click", (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+  
+    // Verificar si se hace clic en el botón de cerrar
+    if (showMessage) {
+        const closeButtonX = messageX + 370;
+        const closeButtonY = messageY + 10;
+        if (mouseX >= closeButtonX && mouseX <= closeButtonX + 20 && mouseY >= closeButtonY && mouseY <= closeButtonY + 20) {
+        showMessage = false;
+        return;
+        }
+    }
 
-    // Si el personaje está lo suficientemente cerca, activa el evento
-    if (distanceX < 50 && distanceY < 50) {
-      // Ajusta el rango de detección según sea necesario
-      // Mostrar tarjeta del evento
-      mostrarTarjeta(evento.descrip);
+    for (let i = 0; i < posiciones.length; i++) {
+      const [x, y] = posiciones[i];
+      const distance = Math.sqrt((mouseX - x) ** 2 + (mouseY - y) ** 2);
+      if (distance < bubbleRadius) {
+        console.log("Bubble clicked:", i);
+        
+        // Establecer mensaje y fondo
+        showMessage = true;
+        message = "Este es un mensaje";
+        messageBg = 'black'; // Puede ser un color o una imagen
+        messageX = x;
+        messageY = y;
+  
+        break;
+      }
     }
   });
-}
-
-function mostrarTarjeta(descripcion) {
-  // Muestra una tarjeta en la pantalla con la descripción del evento
-  const tarjeta = document.createElement("div");
-  tarjeta.style.position = "fixed";
-  tarjeta.style.top = "50%";
-  tarjeta.style.left = "50%";
-  tarjeta.style.transform = "translate(-50%, -50%)";
-  tarjeta.style.backgroundColor = "white";
-  tarjeta.style.padding = "20px";
-  tarjeta.style.border = "1px solid #000";
-  tarjeta.style.zIndex = "1000"; // Asegurarse de que la tarjeta esté sobre otros elementos
-  tarjeta.innerHTML = descripcion;
-
-  document.body.appendChild(tarjeta);
-
-  // Cierra la tarjeta cuando se hace clic fuera de ella
-  tarjeta.addEventListener("click", () => {
-    document.body.removeChild(tarjeta);
-  });
-}
 
 // Dibuja el personaje y eventos
 function draw() {
@@ -272,8 +297,6 @@ function draw() {
     }
   }
 
-  drawEvents();
-
   context.drawImage(
     image,
     sourceX,
@@ -286,8 +309,56 @@ function draw() {
     playerHeight
   );
 
+  for (let i = 0; i < posiciones.length; i++) {
+    const [posX, posY] = posiciones[i];
+
+    // Determina el tamaño de la burbuja dependiendo de si está o no en hover
+    const isHovered = i === hoveredBubble;
+    const currentRadius = isHovered ? bubbleRadius * hoverScale : bubbleRadius;
+    const currentSize = currentRadius * 2;
+
+    // Dibuja el fondo azul
+    context.beginPath();
+    context.arc(posX, posY, currentRadius, 0, 2 * Math.PI);
+    context.fillStyle = 'rgba(64, 224, 208, 0.5)';
+    context.fill();
+
+    // Dibuja el borde
+    context.lineWidth = borderWidth;
+    context.strokeStyle = 'black';
+    context.stroke();
+
+    // Dibuja la imagen de la burbuja
+    context.drawImage(
+      bubbleImage,
+      posX - currentRadius,
+      posY - currentRadius,
+      currentSize,
+      currentSize
+    );
+  }
+  drawMessage();
   requestAnimationFrame(draw);
 }
+
+
+
+
+// canvas.addEventListener("click", (event) => {
+//     const rect = canvas.getBoundingClientRect();
+//     const mouseX = event.clientX - rect.left;
+//     const mouseY = event.clientY - rect.top;
+  
+//     for (let i = 0; i < posiciones.length; i++) {
+//       const [x, y] = posiciones[i];
+//       const distance = Math.sqrt((mouseX - x) ** 2 + (mouseY - y) ** 2);
+//       if (distance < bubbleRadius) {
+//         console.log("Bubble clicked:", i);
+//         // Lógica para mostrar un mensaje o desplegar más información
+//         break;
+//       }
+//     }
+//   });
 
 // Inicia la animación
 function gameLoop(currentTime) {
