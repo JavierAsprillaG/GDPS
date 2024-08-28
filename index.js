@@ -209,11 +209,11 @@ function update(currentTime) {
 }
 
 ///////////////////////////////////////////////////// EVENTOS //////////////////////////////////////////////////////////
-let money = 150000; //aleatorio
+let money = 12000; //aleatorio
 let calidad = 0;
-let motivacion = 100;
-let tiempo = 180; //aleatorio entre 2 y 5 minutos
-const minEventos = 5; //aleatorio entre 5 y 10
+let motivacion = 80;
+let tiempo = 90;
+const minEventos = 5;
 const maxEventos = 10;
 
 const timeInterval = 1000; // Intervalo de 1000 milisegundos (1 segundo)
@@ -238,6 +238,12 @@ const borderWidth = 2; // Ancho del borde
 // Variables para el hover de las burbujas
 const hoverScale = 1.2; // Escala para el hover
 let hoveredBubble = null;
+
+
+function calcularPuntajeTotal(tiempo, calidad, motivacion, money) {
+  let puntajeTotal = tiempo* 0.2 + calidad* 0.3 + motivacion* 0.2 + money/100 * 0.3;
+  return puntajeTotal;
+}
 
 // Manejo del mouse
 canvas.addEventListener("mousemove", (event) => {
@@ -404,22 +410,19 @@ canvas.addEventListener("click", (event) => {
       if (mouseX >= x && mouseX <= x + size && mouseY >= y && mouseY <= y + size) {
         const selectedEvent = eventos.find(evento => evento.description === message.split("\n\n")[0]);
         if (selectedEvent) {
-          console.log("Acción seleccionada:", selectedEvent.actions[index].description);
           motivacion += selectedEvent.actions[index].cost.motivacion;
           calidad += selectedEvent.actions[index].cost.calidad;
           money += selectedEvent.actions[index].cost.money;
           tiempo += selectedEvent.actions[index].cost.tiempo;
-          console.log("Motivación evento:", selectedEvent.actions[index].cost.motivacion);
-          console.log("Calidad evento:", selectedEvent.actions[index].cost.calidad);
-          console.log("Dinero evento:", selectedEvent.actions[index].cost.money);
-          console.log("Tiempo evento:", selectedEvent.actions[index].cost.tiempo);
-          console.log("Motivación:", motivacion);
-          console.log("Calidad:", calidad);
-          console.log("Dinero:", money);
-          console.log("Tiempo:", tiempo);
           showMessage = false;
           closeButton = null;
-          actionButtons = [];s
+          actionButtons = [];
+          // Elimina la burbuja y el evento correspondiente
+          const eventIndex = eventos.indexOf(selectedEvent);
+          if (eventIndex !== -1) {
+            posiciones.splice(eventIndex, 1);
+            eventos.splice(eventIndex, 1);
+          }
         }
         return;
       }
