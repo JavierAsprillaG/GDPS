@@ -4,30 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
     <title>Habbo Style Game</title>
-    <style>
-        body {
-            margin: 0;
-            background-color: #000; /* Fondo negro para la parte adicional */
-        }
-        canvas {
-            background-color: #ccc;
-            display: block;
-            margin: 0 auto;
-        }
-    </style>
 </head>
 <body>
+    <div id="startScreen">
+        <button id="startButton">INICIAR</button>
+        <button id="instructionsButton">INSTRUCCIONES</button>
+    </div>
     <canvas id="gameCanvas" width="1200" height="960"></canvas>
     <canvas id="statsCanvas" width="1200" height="140"></canvas>
     <script src="data/colisiones.js"></script>
+    <div id="instructionsScreen" class="instructions-screen"></div>
+    <div id="finalScore" class="final-score"></div>
+    <script>
+        document.getElementById('instructionsButton').addEventListener('click', function() {
+            // Ocultar los botones de la pantalla de inicio
+            document.getElementById('startButton').style.display = 'none';
+            document.getElementById('instructionsButton').style.display = 'none';
+        
+            // Ocultar la pantalla de inicio
+            document.getElementById('startScreen').style.display = 'none';
+        
+            // Mostrar la pantalla de instrucciones
+            document.getElementById('instructionsScreen').style.display = 'block';
+        });
+
+        // Script para manejar el botón de iniciar
+        document.getElementById('startButton').addEventListener('click', function() {
+            // Aquí puedes agregar el código para iniciar el juego
+            document.getElementById('gameCanvas').style.display = 'block'; // Mostrar el canvas del juego
+            document.body.style.backgroundImage = "none"; // Quitar imagen de fondo de la pantalla de inicio
+        });
+    </script>
     <script type="module" src="index.js"></script>
     <script src="src/logic.js"></script>
-    <div id="eventCard" class="hidden">
-        <p id="eventMessage">Event description goes here...</p>
-    </div>
-      
-
 </body>
 </html>
-

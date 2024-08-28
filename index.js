@@ -11,6 +11,18 @@ const playerHeight = 96;
 const iconSize = 24;
 const padding = 20;
 
+const startScreen = document.getElementById('startScreen');
+const startButton = document.getElementById('startButton');
+
+startButton.addEventListener('click', () => {
+    startScreen.style.display = 'none'; // Oculta la pantalla de inicio
+    canvas.style.display = 'block'; // Muestra el canvas del juego
+    statsCanvas.style.display = 'block'; // Muestra el canvas de estadísticas
+
+    // Inicia el juego
+    startGame();
+});
+
 const icons = {
   money: new Image(),
   quality: new Image(),
@@ -184,25 +196,25 @@ function update(currentTime) {
   let newY = playerY;
 
   // Determina la nueva posición basándose en la dirección del movimiento
-  if (keys.w) {
+  if (keys.w&&gameActive) {
     newY -= playerSpeed;
     direction = "up";
   }
-  if (keys.a) {
+  if (keys.a&&gameActive) {
     newX -= playerSpeed;
     direction = "left";
   }
-  if (keys.s) {
+  if (keys.s&&gameActive) {
     newY += playerSpeed;
     direction = "down";
   }
-  if (keys.d) {
+  if (keys.d&&gameActive) {
     newX += playerSpeed;
     direction = "right";
   }
 
   // Verificar colisión en la nueva posición
-  if (!checkCollision(newX, newY)) {
+  if (!checkCollision(newX, newY)&&gameActive) {
     playerX = newX;
     playerY = newY;
   }
@@ -217,12 +229,24 @@ const minEventos = 5;
 const maxEventos = 10;
 
 const timeInterval = 1000; // Intervalo de 1000 milisegundos (1 segundo)
-setInterval(() => {
-  if (tiempo > 0) {
-    tiempo -= 1; // Decrementa el tiempo por 1 segundo
-    drawStats(); // Redibuja las estadísticas para reflejar el nuevo valor
-  }
-}, timeInterval);
+let gameActive = true; // Esta variable indica si el juego está activo
+
+function startTimer() {
+  const timerInterval = setInterval(() => {
+    if (!gameActive) {
+      clearInterval(timerInterval); // Detiene el intervalo cuando el juego no está activo
+      return;
+    }
+
+    if (tiempo > 0) {
+      tiempo -= 1; // Decrementa el tiempo por 1 segundo
+      drawStats(); // Redibuja las estadísticas para reflejar el nuevo valor
+    } else {
+      gameActive = false; // Detiene el juego si el tiempo llega a 0
+      showFinalScore(); // Muestra el puntaje final
+    }
+  }, timeInterval);
+}
 
 const eventos = getUniqueElements(10);
 console.log(eventos);
@@ -386,7 +410,7 @@ function drawMessage() {
     closeButton = { x: closeButtonX, y: closeButtonY, size: closeButtonSize };
   }
 }
-
+const nearbyRadius = 100; // Ajusta este valor según sea necesario
 canvas.addEventListener("click", (event) => {
   const rect = canvas.getBoundingClientRect();
   const mouseX = event.clientX - rect.left;
@@ -434,20 +458,60 @@ canvas.addEventListener("click", (event) => {
     const [x, y] = posiciones[i];
     const distance = Math.sqrt((mouseX - x) ** 2 + (mouseY - y) ** 2);
     if (distance < bubbleRadius) {
-      console.log("Bubble clicked:", i);
-      
-      const event = eventos[i];
+      const playerBounds = getPlayerBounds();
+      const distanceToBubble = Math.sqrt(
+        (playerX - x) ** 2 + (playerY - y) ** 2
+      );
 
-      // Establecer mensaje y fondo
-      showMessage = true;
-      message = event.description + "\n\n" + event.actions.map(action => "- " + action.description).join("\n");
-      messageBg = 'black'; // Puede ser un color o una imagen
+      if (distanceToBubble <= nearbyRadius) {
+        const event = eventos[i];
 
+        // Establecer mensaje y fondo
+        showMessage = true;
+        message = event.description + "\n\n" + event.actions.map(action => "- " + action.description).join("\n");
+        messageBg = 'black'; // Puede ser un color o una imagen
+      }
       break;
     }
   }
 });
 
+function checkGameOver() {
+  if (tiempo <= 0 || money < 0 || motivacion < 0 || posiciones.length === 0) {
+    gameActive = false; // Detiene el juego
+    showFinalScore(); // Muestra el puntaje final
+  }
+}
+
+
+function showFinalScore() {
+  const finalScoreDiv = document.getElementById('finalScore');
+  // Aquí puedes calcular tu puntaje final
+  const score = calcularPuntajeTotal(tiempo, calidad, motivacion, money);
+  finalScoreDiv.innerHTML = `Tu puntaje final es: ${score}`;
+  finalScoreDiv.style.display = 'block';
+}
+
+
+function resizeCanvas() {
+  const canvas = document.getElementById('gameCanvas');
+  const aspectRatio = 1200 / 960; // Relación de aspecto del canvas
+
+  let width = window.innerWidth;
+  let height = window.innerHeight;
+
+  if (width / height > aspectRatio) {
+      width = height * aspectRatio;
+  } else {
+      height = width / aspectRatio;
+  }
+
+  canvas.width = width;
+  canvas.height = height;
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas(); // Llama a la función para el tamaño inicial
 
 // Dibuja el personaje y eventos
 function draw() {
@@ -528,6 +592,12 @@ function gameLoop(currentTime) {
   draw();
   drawStats();
   requestAnimationFrame(gameLoop);
+  checkGameOver();
 }
 
-gameLoop();
+function startGame() {
+  gameActive = true; // Asegúrate de que el juego esté activo al comenzar
+  startTimer();
+  gameLoop(); // Comienza el loop del juego
+  startTimer(); // Comienza el temporizador del juego
+}

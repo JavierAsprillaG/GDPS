@@ -29,6 +29,100 @@
          url('fonts/my-pixel-font.woff') format('woff');
 }
 
+.final-score {
+    font-family: 'Pixelar', sans-serif;
+    font-size: 24px;
+    color: white;
+    background-color: black;
+    padding: 20px;
+    border: 2px solid white;
+    border-radius: 10px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    text-align: center;
+    display: none; /* Ocultar por defecto */
+}
+
+/* Estilos globales */
 body {
-    font-family: 'MyPixelFont', sans-serif;
+    margin: 0;
+    background-color: #000;
+    font-family: 'Press Start 2P', sans-serif;
+}
+
+/* Estilo del canvas del juego */
+#gameCanvas {
+    background-color: #ccc;
+    display: none;
+    margin: 0 auto;
+}
+
+/* Estilo del canvas de estadísticas */
+#statsCanvas {
+    display: none;
+    background-color: #ffffff;
+    margin: 0 auto;
+}
+
+/* Estilo de la pantalla de inicio */
+#startScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/img/menuv1.jpg');
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Estilo del botón de inicio */
+#startButton {
+    position: absolute;
+    top: 65%; /* Cambia este valor para bajar el botón */
+    left: 43,5%;
+    padding: 20px 40px;
+    background-color: #ffcc00;
+    border: 5px solid #000;
+    font-size: 24px;
+    cursor: pointer;
+    color: #000;
+    font-family: 'Press Start 2P', sans-serif;
+    text-transform: uppercase;
+}
+
+#instructionsButton {
+    position: absolute;
+    top: 75%; /* Cambia este valor para bajar el botón */
+    left: 43,7%;
+    padding: 20px 40px;
+    background-color: #ffcc00;
+    border: 5px solid #000;
+    font-size: 24px;
+    cursor: pointer;
+    color: #000;
+    font-family: 'Press Start 2P', sans-serif;
+    text-transform: uppercase;
+}
+
+.hidden {
+    display: none;
+}
+
+.instructions-screen {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw; /* Ajusta al ancho de la ventana */
+    height: 100vh; /* Ajusta a la altura de la ventana */
+    background-image: url('../img/manual.jpg');
+    background-size: contain; /* Ajusta la imagen de instrucciones según el tamaño */
+    background-repeat: no-repeat;
+    background-position: center;
 }

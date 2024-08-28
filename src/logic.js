@@ -65,7 +65,7 @@ const eventos = [
       {
         "description": "Implementar el cambio pero solicitar más recursos.",
         "cost": {
-          "money": -10000,
+          "money": -8000,
           "calidad": 0,
           "tiempo": 120,
           "motivacion": 5
@@ -81,7 +81,7 @@ const eventos = [
       },
       {
         "description": "Contratar personal adicional para cubrir el cambio.",
-        "cost": { "money": -12000, "calidad": 5, "tiempo": 0, "motivacion": 0 }
+        "cost": { "money": -2000, "calidad": 5, "tiempo": 0, "motivacion": 0 }
       },
       {
         "description": "Solicitar una extensión del tiempo de entrega.",
@@ -103,7 +103,7 @@ const eventos = [
     "actions": [
       {
         "description": "Organizar un retiro de equipo.",
-        "cost": { "money": -15000, "calidad": 0, "tiempo": 0, "motivacion": 15 }
+        "cost": { "money": -3000, "calidad": 0, "tiempo": 0, "motivacion": 15 }
       },
       {
         "description": "Asignar tiempo para descansos adicionales.",
@@ -119,7 +119,7 @@ const eventos = [
       },
       {
         "description": "Contratar personal temporal para aliviar la carga.",
-        "cost": { "money": -10000, "calidad": 0, "tiempo": 0, "motivacion": 5 }
+        "cost": { "money": -2000, "calidad": 0, "tiempo": 0, "motivacion": 5 }
       },
       {
         "description": "Permitir trabajo remoto para reducir el estrés.",
@@ -861,7 +861,7 @@ const eventos = [
       {
         "description": "Contratar a un consultor para mejorar las áreas críticas.",
         "cost": {
-          "money": -15000,
+          "money": -2500,
           "calidad": 10,
           "tiempo": 120,
           "motivacion": 0
@@ -886,7 +886,7 @@ const eventos = [
       {
         "description": "Asignar más recursos para abordar los problemas críticos.",
         "cost": {
-          "money": -10000,
+          "money": -6000,
           "calidad": 10,
           "tiempo": 60,
           "motivacion": 0
@@ -922,7 +922,7 @@ const eventos = [
       {
         "description": "Contratar a un especialista en tecnología para optimizar el uso de las herramientas.",
         "cost": {
-          "money": -15000,
+          "money": -2500,
           "calidad": 5,
           "tiempo": 120,
           "motivacion": 0
@@ -939,7 +939,7 @@ const eventos = [
       {
         "description": "Implementar una solución personalizada que se ajuste mejor a las necesidades del equipo.",
         "cost": {
-          "money": -20000,
+          "money": -10000,
           "calidad": 5,
           "tiempo": 120,
           "motivacion": 0
@@ -1030,7 +1030,7 @@ const eventos = [
       {
         "description": "Contratar personal adicional temporal para completar el proyecto rápidamente.",
         "cost": {
-          "money": -15000,
+          "money": -2500,
           "calidad": 0,
           "tiempo": -240,
           "motivacion": 0
@@ -1051,7 +1051,7 @@ const eventos = [
       {
         "description": "Externalizar tareas pendientes para acelerar el progreso.",
         "cost": {
-          "money": -10000,
+          "money": -6000,
           "calidad": 0,
           "tiempo": -180,
           "motivacion": 0
@@ -1060,7 +1060,7 @@ const eventos = [
       {
         "description": "Implementar una política de horas extras con compensación adicional para acelerar el progreso.",
         "cost": {
-          "money": -7000,
+          "money": -5000,
           "calidad": 0,
           "tiempo": -120,
           "motivacion": -5
@@ -1095,7 +1095,7 @@ const eventos = [
       {
         "description": "Iniciar una campaña de marketing agresiva para atraer la atención al producto.",
         "cost": {
-          "money": -20000,
+          "money": -12000,
           "calidad": 0,
           "tiempo": -60,
           "motivacion": 0
@@ -1108,7 +1108,7 @@ const eventos = [
       {
         "description": "Buscar asociaciones estratégicas para ganar cuota de mercado rápidamente.",
         "cost": {
-          "money": -10000,
+          "money": -6000,
           "calidad": 5,
           "tiempo": -60,
           "motivacion": 0
@@ -1153,7 +1153,7 @@ const eventos = [
       {
         "description": "Contratar un servicio de soporte de emergencia para resolver el problema rápidamente.",
         "cost": {
-          "money": -15000,
+          "money": -3000,
           "calidad": 0,
           "tiempo": -120,
           "motivacion": 0
@@ -1175,7 +1175,7 @@ const eventos = [
       {
         "description": "Revisar el sistema para identificar y solucionar la causa raíz del problema.",
         "cost": {
-          "money": -10000,
+          "money": -8000,
           "calidad": 5,
           "tiempo": -90,
           "motivacion": 0
