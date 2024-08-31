@@ -221,15 +221,15 @@ function update(currentTime) {
 }
 
 ///////////////////////////////////////////////////// EVENTOS //////////////////////////////////////////////////////////
-let money = 12000; //aleatorio
+let money = 12000; 
 let calidad = 0;
 let motivacion = 80;
-let tiempo = 90;
+let tiempo = 120;
 const minEventos = 5;
 const maxEventos = 10;
 
-const timeInterval = 1000; // Intervalo de 1000 milisegundos (1 segundo)
-let gameActive = true; // Esta variable indica si el juego está activo
+const timeInterval = 1000; 
+let gameActive = true; 
 
 function startTimer() {
   const timerInterval = setInterval(() => {
@@ -242,14 +242,13 @@ function startTimer() {
       tiempo -= 1; // Decrementa el tiempo por 1 segundo
       drawStats(); // Redibuja las estadísticas para reflejar el nuevo valor
     } else {
-      gameActive = false; // Detiene el juego si el tiempo llega a 0
-      showFinalScore(); // Muestra el puntaje final
+      gameActive = false; 
+      showFinalScore(); 
     }
   }, timeInterval);
 }
 
 const eventos = getUniqueElements(10);
-console.log(eventos);
 const posiciones = [ [145,320],[145,433],[145,665],[410,190],[627,532],[246,790], [838,616],[1085,219],[1071,549],[536,756]]
 
 const bubbleImage = new Image();
@@ -597,7 +596,6 @@ function gameLoop(currentTime) {
 
 function startGame() {
   gameActive = true; // Asegúrate de que el juego esté activo al comenzar
-  startTimer();
   gameLoop(); // Comienza el loop del juego
   startTimer(); // Comienza el temporizador del juego
 }
